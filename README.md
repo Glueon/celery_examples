@@ -9,6 +9,7 @@
 * `01-synchroonous-execution.py` - execute a group of tasks with blocking I/O in one Celery worker 
 * `02-synchroonous-execution-multiple-workers.py` - same as the previous example but with multiple workrs
 * `03-async-execution-with-eventlet.py` - execute a group of tasks with eventlet option enabled in celery and with non-blocking I/O
+* `04-dynamic-rate-limit.py` - performs two tasks in parallel. Each task has a `for` loop which tries to execute external function not faster than the given speed. It's usually is used when you have an API which has some requests/second limitations.
 
 
 ### Running examples
