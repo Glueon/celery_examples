@@ -1,6 +1,7 @@
 from time import sleep, time
 from celery import shared_task
 import eventlet
+import redis
 
 
 def blocking_slow_io_operations():
@@ -58,3 +59,24 @@ def parser_with_speed_control(number_of_requests, execution_time, url):
             eventlet.sleep(freeze_time)
 
         print('Done')
+
+
+@shared_task(bind=True, acks_late=True)
+def task_which_reruns_if_celery_is_killed(self, number_of_requests, url):
+    # This always gives None. Why?
+    # task_id = self.request.id
+
+    task_id = url
+
+    r = redis.StrictRedis(host='localhost', port=6379, db=1)
+    requests_proceeded = r.get(task_id)
+    print(requests_proceeded, task_id)
+
+    requests_proceeded = 0 if requests_proceeded is None else int(requests_proceeded)
+
+    for i in range(requests_proceeded, number_of_requests):
+        print('{}. {}/{}'.format(url, i, number_of_requests + 1))
+
+        non_blocking_slow_io_operations()
+
+        r.incr(task_id)
