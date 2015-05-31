@@ -10,7 +10,8 @@
 * `02-synchroonous-execution-multiple-workers.py` - same as the previous example but with multiple workrs
 * `03-async-execution-with-eventlet.py` - execute a group of tasks with eventlet option enabled in celery and with non-blocking I/O
 * `04-dynamic-rate-limit.py` - performs two tasks in parallel. Each task has a `for` loop which tries to execute external function not faster than the given speed. It's usually is used when you have an API which has some requests/second limitations.
-* `05-dynamic-rate-limit-using-chains.py` - another approach for the previous example. Here instead of creating one big task we divide it into subtasks. So each for iteration from the previous example is no a seperate task. Tasks are linked using callbacks so whenever the tasks completes it notifies the second one that it should start working, supplying the ammount of seconds it should wait before it starts the work.
+* `05-make-task-execution-celery-kill-tolerant.py` - simple example of how to rerun a task in case of celery death.
+* `06-dynamic-rate-limit-using-chains.py` - another approach for the previous example. Here instead of creating one big task we divide it into subtasks. So each for iteration from the previous example is no a seperate task. Tasks are linked using callbacks so whenever the tasks completes it notifies the second one that it should start working, supplying the ammount of seconds it should wait before it starts the work.
 
 
 ### Running examples
