@@ -62,9 +62,9 @@ def parser_with_speed_control(number_of_requests, execution_time, url):
 
 
 @shared_task
-def final_parser_task(*args, **kwargs):
+def final_parser_task(task_id):
     r = redis.StrictRedis(host='localhost', port=6379, db=1)
-    r.delete(kwargs['task_id'])
+    r.delete(task_id)
     print('All task has been completed')
 
 

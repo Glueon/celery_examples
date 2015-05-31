@@ -17,7 +17,7 @@ initial_func = parser_with_speed_control_using_chain.s(0, number_of_requests, ex
 # The same as the previous one, but without the freeze_time param.
 parse_func = parser_with_speed_control_using_chain.s(number_of_requests, execution_time, 'http://hellowolrd.com', task_id)
 # Cleans the temp data like iteration counters and reports that task succeded
-clean_up_func = final_parser_task.s(task_id=task_id)
+clean_up_func = final_parser_task.si(task_id=task_id)
 
 tasks_chain = [initial_func] + [parse_func] * (number_of_requests - 1) + [clean_up_func]
 chain(*tasks_chain)()
