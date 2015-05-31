@@ -61,8 +61,44 @@ def parser_with_speed_control(number_of_requests, execution_time, url):
         print('Done')
 
 
+@shared_task
+def final_parser_task(*args, **kwargs):
+    r = redis.StrictRedis(host='localhost', port=6379, db=1)
+    r.delete(kwargs['task_id'])
+    print('All task has been completed')
+
+
+@shared_task(bind=True)
+def parser_with_speed_control_using_chain(self, freeze_time, number_of_requests, execution_time, url, task_id):
+    if freeze_time != 0:
+        print('Freezing for {}'.format(freeze_time))
+        eventlet.sleep(freeze_time)
+
+    try:
+        r = redis.StrictRedis(host='localhost', port=6379, db=1)
+        requests_proceeded = r.get(task_id)
+
+        requests_proceeded = 0 if requests_proceeded is None else int(requests_proceeded)
+        print('{}. {}/{}'.format(url, requests_proceeded + 1, number_of_requests))
+
+        start = time()
+        non_blocking_slow_io_operations()
+        elapsed = time() - start
+
+    except redis.exceptions.RedisError:
+        print('Retrying task')
+        self.retry()
+
+    r.incr(task_id)
+    seconds_per_request = execution_time / number_of_requests
+    return max(seconds_per_request - elapsed, 0)
+
+
+# About acks_late consult https://celery.readthedocs.org/en/latest/reference/celery.app.task.html#celery.app.task.Task.acks_late
 @shared_task(bind=True, acks_late=True)
 def task_which_reruns_if_celery_is_killed(self, number_of_requests, url):
+    """Task resumes even if celery is killed. The tasks keeps track of how many subtaks has been executed
+    """
     # This always gives None. Why?
     # task_id = self.request.id
 
@@ -70,7 +106,6 @@ def task_which_reruns_if_celery_is_killed(self, number_of_requests, url):
 
     r = redis.StrictRedis(host='localhost', port=6379, db=1)
     requests_proceeded = r.get(task_id)
-    print(requests_proceeded, task_id)
 
     requests_proceeded = 0 if requests_proceeded is None else int(requests_proceeded)
 
