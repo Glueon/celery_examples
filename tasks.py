@@ -63,7 +63,7 @@ def parser_with_speed_control(number_of_requests, execution_time, url):
 
 @shared_task
 def final_parser_task(task_id):
-    r = redis.StrictRedis(host='localhost', port=6379, db=1)
+    r = redis.StrictRedis(host='redis', port=6379, db=1)
     r.delete(task_id)
     print('All task has been completed')
 
@@ -75,7 +75,7 @@ def parser_with_speed_control_using_chain(self, freeze_time, number_of_requests,
         eventlet.sleep(freeze_time)
 
     try:
-        r = redis.StrictRedis(host='localhost', port=6379, db=1)
+        r = redis.StrictRedis(host='redis', port=6379, db=1)
         requests_proceeded = r.get(task_id)
 
         requests_proceeded = 0 if requests_proceeded is None else int(requests_proceeded)
@@ -104,7 +104,7 @@ def task_which_reruns_if_celery_is_killed(self, number_of_requests, url):
 
     task_id = url
 
-    r = redis.StrictRedis(host='localhost', port=6379, db=1)
+    r = redis.StrictRedis(host='redis', port=6379, db=1)
     requests_proceeded = r.get(task_id)
 
     requests_proceeded = 0 if requests_proceeded is None else int(requests_proceeded)

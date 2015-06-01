@@ -3,7 +3,7 @@
 ### Non example files
 * `celeryconfig.py` - default configuration of the Celery daemon I use across all examples
 * `tasks.py` - celery tasks I invoke in all examples
-* `docker-compose.yml` - used to spin up a container with the redis which is used as a broker and a result storage. There is no `celery` container because the default one does not have `eventlet` module
+* `docker-compose.yml` - used to spin up a container with the redis which is used as a broker and a result storage.
 
 ### Examples
 * `01-synchroonous-execution.py` - execute a group of tasks with blocking I/O in one Celery worker 
@@ -16,13 +16,17 @@
 
 ### Running examples
 
+First of all install `docker-compose`. After that:
+* Build containers and start redis container: `docker-compose up`
+* Run an example using `docker-compose run EXAMPLE_NAME`:
+
 To run an example which does not use `eventlet` (like `01-synchroonous-execution`) just type:
 
-	celery worker  --loglevel=info  -A 01-synchroonous-execution
+	docker-compose run celery 01-synchroonous-execution
 
 For running eventlet examples (like `03-async-execution-with-eventlet`) use:
 
-	celery worker  --loglevel=info  -A 03-async-execution-with-eventlet -P eventlet
+	docker-compose run celery 03-async-execution-with-eventlet -P eventlet
 
 We need to specify the `-P eventlet` in a command line and can't set this setting in code because the docs [say](https://celery.readthedocs.org/en/latest/configuration.html#celeryd-pool):
 
